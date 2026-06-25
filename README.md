@@ -1,8 +1,8 @@
 # Agent Harness Demo
 
-这是一个最小可运行的 Python CLI 项目，用于提交 Agent Harness 工程实习生测试题。项目重点展示 Agent 执行任务时常见的 harness 能力：状态机、Tool Registry、参数校验、工具调用日志、失败重试、重复失败检测，以及最小沙箱执行思路。
+这是一个用于演示 Agent Harness 基础执行链路的 Python CLI 项目。项目重点展示 Agent 执行任务时常见的 harness 能力：状态机、Tool Registry、参数校验、工具调用日志、失败重试、重复失败检测，以及最小沙箱执行思路。
 
-项目不依赖真实大模型 API。Agent 决策由脚本模拟，方便本地复现和评测。
+项目暂未接入真实大模型 API，当前使用规则流程模拟 Agent 决策，便于本地稳定复现。
 
 ## 快速运行
 
@@ -51,7 +51,7 @@ def add(a, b):
 assert add(1, 2) == 3
 ```
 
-运行 `python main.py --task "fix failing test"` 后，脚本化 Agent 会执行：
+运行 `python main.py --task "fix failing test"` 后，当前规则流程会执行：
 
 1. 进入 `RECEIVED`、`CONTEXT_LOADING`、`PLANNING`
 2. 选择并调用 `read_file` 读取 `buggy_code.py`
@@ -175,9 +175,9 @@ logs/
 - `stdout`、`stderr`、`error` 最多保留 4000 字符
 - `bash` 工具默认 `require_approval=True`
 
-真实系统还需要容器/虚拟机隔离、资源限制、网络策略、审计和更完整的权限模型。本 Demo 只保留最小可读实现。
+当前实现侧重演示核心链路，生产环境还需要补充容器隔离、资源限制、网络策略和更完整的权限模型。
 
-## 测试题四个问题与 Demo 功能对应关系
+## 设计点说明
 
 1. Agent 执行任务如何建模  
    `DemoAgent` 使用显式状态机记录从接收任务、加载上下文、规划、选择工具、执行工具、观察结果、测试、重试到完成或失败的全过程。
@@ -190,11 +190,3 @@ logs/
 
 4. 如何体现安全边界和可观测性  
    文件访问限制在 `workspace/`；受限 `bash` 拦截危险命令并带 timeout；输出截断；所有状态变化和工具调用写入 `logs/trace.jsonl`，并对敏感字段脱敏。
-
-## 交付建议
-
-最终 zip 包建议名称：
-
-```text
-Agent_Harness_Demo_何伟.zip
-```
